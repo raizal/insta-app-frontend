@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -51,6 +52,24 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				sevima: {
+					blue: '#0055A5',
+					lightBlue: '#4899D2',
+					darkBlue: '#003C73',
+					orange: '#FF8C42',
+					green: '#52BD95',
+					gray: '#F5F5F5',
+					darkGray: '#777777',
+					black: '#333333',
+				},
+				instagram: {
+					pink: '#E1306C',
+					purple: '#833AB4',
+					orange: '#F77737',
+					yellow: '#FCAF45',
+					red: '#FD1D1D',
+					gradient: 'linear-gradient(45deg, #833AB4, #FD1D1D, #FCAF45)'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
