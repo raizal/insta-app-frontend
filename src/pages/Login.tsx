@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useCsrf } from "@/hooks/use-csrf";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoading } = useLogin();
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
+  const { login, isLoading, error } = useLogin();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -25,6 +28,15 @@ const Login = () => {
       navigate("/");
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (error) {
+      if (typeof error === 'object' && error !== null) {
+        // Handle validation errors from API
+        setFormErrors(error as Record<string, string[]>);
+      }
+    }
+  }, [error]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +61,26 @@ const Login = () => {
             <CardTitle className="text-center text-sevima-blue">Login</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit}  className="space-y-4">
+            {csrfError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {typeof csrfError === 'string' ? csrfError : 'Failed to get CSRF token. Please refresh the page.'}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {formErrors.login && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {formErrors.login.map((error, index) => (
+                      <p key={`login-error-${index}`}>{error}</p>
+                    ))}
+                  </AlertDescription>
+                </Alert>
+              )}
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
                   Email or Username
@@ -61,7 +92,11 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className={formErrors.email ? "border-red-500" : ""}
                 />
+                {formErrors.email && formErrors.email.map((error, index) => (
+                  <p key={`email-error-${index}`} className="text-sm text-red-500">{error}</p>
+                ))}
               </div>
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">
@@ -74,7 +109,11 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className={formErrors.password ? "border-red-500" : ""}
                 />
+                {formErrors.password && formErrors.password.map((error, index) => (
+                  <p key={`password-error-${index}`} className="text-sm text-red-500">{error}</p>
+                ))}
               </div>
               <Button
                 type="submit"

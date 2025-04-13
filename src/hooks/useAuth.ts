@@ -21,7 +21,7 @@ interface RegisterParams extends WithCsrfToken {
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | Record<string, string[]> | null>(null);
   const { login: contextLogin } = useAuthContext();
 
   const login = async ({ email, password, _token }: LoginParams) => {
@@ -38,7 +38,16 @@ export const useLogin = () => {
       return { success: true, data: response };
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
-        const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
+        const responseData = err.response?.data;
+        
+        // Check for validation errors in the format described
+        if (responseData && !responseData.success && responseData.errors) {
+          setError(responseData.errors);
+          return { success: false, error: responseData.errors };
+        }
+        
+        // Fallback to regular error message
+        const errorMessage = responseData?.message || 'Login failed. Please try again.';
         setError(errorMessage);
         toast.error(errorMessage);
         return { success: false, error: errorMessage };
