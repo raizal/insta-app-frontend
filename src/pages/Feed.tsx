@@ -15,7 +15,6 @@ const Feed = () => {
   const [newPostsAvailable, setNewPostsAvailable] = useState(false);
 
   const { posts, fetchPosts, fetchMorePosts, isLoading, isLoadingMore, hasMore } = usePosts();
-  console.log('hasMore : ', hasMore);
   const normalizedPosts = useMemo(() => {
     return posts.map((paging) => paging.data).flat();
   }, [posts]);

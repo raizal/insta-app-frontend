@@ -28,13 +28,8 @@ const Login = () => {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting");
     if (!email || !password) return;
-    const result = await login({ email, password, _token: csrfToken });
-    console.log("Result: " + result);
-    if (result.success) {
-      // navigate("/");
-    }
+    await login({ email, password, _token: csrfToken });
   }, [email, password, csrfToken, login]);
 
   return (

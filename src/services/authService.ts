@@ -33,7 +33,6 @@ export const register = async (params: RegisterParams) => {
     formData.append('email', params.email);
     formData.append('password', params.password);
     formData.append('password_confirmation', params.password_confirmation);
-    console.log(params.image);
     if (params.image) {
       formData.append('profile_picture_url', params.image);
     }
@@ -55,10 +54,6 @@ export const login = async (params: LoginParams) => {
       },
       withCredentials: true,
     });
-
-    if (!response.data.success) {
-      throw new Error('Login failed');
-    }
 
     return response.data.user;
 }; 

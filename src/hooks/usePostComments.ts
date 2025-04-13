@@ -43,7 +43,6 @@ export function usePostComments(postId: string | number): UsePostCommentsReturn 
     
     try {
       const response = await fetchComments(1);
-      console.log(response);
       setComments(response.data);
       setCurrentPage(response.current_page);
       setLastPage(response.last_page);

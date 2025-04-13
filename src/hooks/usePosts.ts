@@ -80,7 +80,6 @@ export const usePosts = (): PostHook => {
       const response = await getPosts(_page);
       setPage(_page);
       setPosts([...posts, response]);
-      console.log('response : ', response.next_page_url !== null);
       setHasMore(response.next_page_url !== null);
     } catch (error) {
       console.error("Error fetching posts:", error);

@@ -17,7 +17,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -39,8 +39,8 @@ const Register = () => {
   useEffect(() => {
     if (error) {
       if (typeof error === 'object' && error !== null) {
-        // Handle validation errors from API (assuming the error object has field keys)
-        setFormErrors(error as Record<string, string>);
+        // Handle validation errors from API
+        setFormErrors(error as Record<string, string[]>);
       } else {
         // Handle general errors
         toast.error(typeof error === 'string' ? error : 'Registration failed. Please try again.');
@@ -49,14 +49,14 @@ const Register = () => {
   }, [error]);
 
   const validateForm = () => {
-    const errors: Record<string, string> = {};
+    const errors: Record<string, string[]> = {};
     
-    if (!username.trim()) errors.username = "Username is required";
-    if (!email.trim()) errors.email = "Email is required";
-    if (!name.trim()) errors.name = "Display name is required";
-    if (!password) errors.password = "Password is required";
-    if (password.length < 8) errors.password = "Password must be at least 8 characters";
-    if (password !== passwordConfirmation) errors.passwordConfirmation = "Passwords don't match";
+    if (!username.trim()) errors.username = ["Username is required"];
+    if (!email.trim()) errors.email = ["Email is required"];
+    if (!name.trim()) errors.name = ["Display name is required"];
+    if (!password) errors.password = ["Password is required"];
+    if (password.length < 8) errors.password = ["Password must be at least 8 characters"];
+    if (password !== passwordConfirmation) errors.passwordConfirmation = ["Passwords don't match"];
     
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -183,9 +183,9 @@ const Register = () => {
                   required
                   className={formErrors.username ? "border-red-500" : ""}
                 />
-                {formErrors.username && (
-                  <p className="text-sm text-red-500">{formErrors.username}</p>
-                )}
+                {formErrors.username && formErrors.username.map((error, index) => (
+                  <p key={`username-error-${index}`} className="text-sm text-red-500">{error}</p>
+                ))}
               </div>
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
@@ -200,9 +200,9 @@ const Register = () => {
                   required
                   className={formErrors.email ? "border-red-500" : ""}
                 />
-                {formErrors.email && (
-                  <p className="text-sm text-red-500">{formErrors.email}</p>
-                )}
+                {formErrors.email && formErrors.email.map((error, index) => (
+                  <p key={`email-error-${index}`} className="text-sm text-red-500">{error}</p>
+                ))}
               </div>
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium">
@@ -217,9 +217,9 @@ const Register = () => {
                   required
                   className={formErrors.name ? "border-red-500" : ""}
                 />
-                {formErrors.name && (
-                  <p className="text-sm text-red-500">{formErrors.name}</p>
-                )}
+                {formErrors.name && formErrors.name.map((error, index) => (
+                  <p key={`name-error-${index}`} className="text-sm text-red-500">{error}</p>
+                ))}
               </div>
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">
@@ -234,9 +234,9 @@ const Register = () => {
                   required
                   className={formErrors.password ? "border-red-500" : ""}
                 />
-                {formErrors.password && (
-                  <p className="text-sm text-red-500">{formErrors.password}</p>
-                )}
+                {formErrors.password && formErrors.password.map((error, index) => (
+                  <p key={`password-error-${index}`} className="text-sm text-red-500">{error}</p>
+                ))}
               </div>
               <div className="space-y-2">
                 <label htmlFor="passwordConfirmation" className="text-sm font-medium">
@@ -251,9 +251,9 @@ const Register = () => {
                   required
                   className={formErrors.passwordConfirmation ? "border-red-500" : ""}
                 />
-                {formErrors.passwordConfirmation && (
-                  <p className="text-sm text-red-500">{formErrors.passwordConfirmation}</p>
-                )}
+                {formErrors.passwordConfirmation && formErrors.passwordConfirmation.map((error, index) => (
+                  <p key={`passwordConfirmation-error-${index}`} className="text-sm text-red-500">{error}</p>
+                ))}
               </div>
               <Button
                 type="submit"
