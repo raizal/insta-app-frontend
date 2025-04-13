@@ -16,7 +16,6 @@ interface LoginParams extends WithCsrfToken {
 }
 
 export const me = async () => {
-  try {
     const response = await axios.get<{ user: User }>('/web/user', {
       headers: {
         'Content-Type': 'application/json',
@@ -25,13 +24,9 @@ export const me = async () => {
     });
 
     return response.data.user;
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const register = async (params: RegisterParams) => {
-  try {
     const formData = new FormData();
     formData.append('name', params.name);
     formData.append('username', params.username);
@@ -51,13 +46,9 @@ export const register = async (params: RegisterParams) => {
     });
 
     return response.data.user;
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const login = async (params: LoginParams) => {
-  try {
     const response = await axios.post('/web/login', { ...params, login: params.email }, {
       headers: {
         'Content-Type': 'application/json',
@@ -65,8 +56,9 @@ export const login = async (params: LoginParams) => {
       withCredentials: true,
     });
 
+    if (!response.data.success) {
+      throw new Error('Login failed');
+    }
+
     return response.data.user;
-  } catch (error) {
-    throw error;
-  }
 }; 
