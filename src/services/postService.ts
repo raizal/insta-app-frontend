@@ -30,31 +30,6 @@ export const submitComment = async (postId: number, comment: string): Promise<Ap
   return response.data;
 }
 
-// export const addComment = async (postId: string, comment: Omit<Comment, "id" | "createdAt">): Promise<Comment> => {
-//   const posts = await getPosts();
-//   const postIndex = posts.findIndex((p) => p.id === postId);
-
-//   if (postIndex === -1) {
-//     throw new Error("Post not found");
-//   }
-
-//   const newComment: Comment = {
-//     ...comment,
-//     id: `comment${Date.now()}`,
-//     createdAt: new Date(),
-//   };
-
-//   posts[postIndex].comments.push(newComment);
-//   localStorage.setItem("posts", JSON.stringify(posts));
-
-//   return newComment;
-// };
-
-// export const getUserPosts = async (userId: string): Promise<Post[]> => {
-//   const posts = await getPosts();
-//   return posts.filter((post) => post.userId === userId);
-// };
-
 export const fetchPostComments = async (postId: string | number, page: number = 1): Promise<ApiResponse<PaginatedResponse<Comment>>> => {
   try {
     const response = await axios.get(`/web/posts/${postId}/comments`, {

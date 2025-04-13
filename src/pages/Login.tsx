@@ -19,10 +19,6 @@ const Login = () => {
 
   const { getCsrfToken, isLoading: csrfLoading, error: csrfError, csrfToken } = useCsrf();
 
-  // useEffect(() => {
-  //   getCsrfToken();
-  // }, []);
-
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/");

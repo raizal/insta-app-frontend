@@ -34,7 +34,7 @@ export const register = async (params: RegisterParams) => {
     formData.append('password', params.password);
     formData.append('password_confirmation', params.password_confirmation);
     if (params.image) {
-      formData.append('profile_picture_url', params.image);
+      formData.append('profile_picture', params.image);
     }
 
     const response = await axios.post('/web/register', formData, {
