@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Post from "@/components/Post";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserCheck } from "lucide-react";
+import { UserPlus, UserCheck, Lock } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 const Profile = () => {
@@ -22,6 +22,8 @@ const Profile = () => {
   } = useUserProfile(username);
 
   const isOwnProfile = currentUser?.username === username;
+  const isFollowing = user?.follow_status?.is_following || false;
+  const canViewPosts = isOwnProfile || isFollowing;
 
   const navigate = useNavigate();
 
@@ -30,12 +32,12 @@ const Profile = () => {
     if (!username && currentUser?.username) {
       navigate(`/profile/${currentUser.username}`);
     }
-  }, [username, currentUser]);
+  }, [username, currentUser, navigate]);
 
   // Infinite scroll setup
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPostRef = useCallback((node: HTMLDivElement | null) => {
-    if (loading) return;
+    if (loading || !canViewPosts) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore) {
@@ -43,7 +45,7 @@ const Profile = () => {
       }
     });
     if (node) observer.current.observe(node);
-  }, [loading, hasMore, loadMore]);
+  }, [loading, hasMore, loadMore, canViewPosts]);
 
   if (loading && posts.length === 0) {
     return (
@@ -83,12 +85,12 @@ const Profile = () => {
           {currentUser && !isOwnProfile && user && (
             <Button 
               onClick={toggleFollowStatus}
-              variant={user.follow_status.is_following ? "outline" : "default"}
+              variant={user.follow_status?.is_following ? "outline" : "default"}
               size="sm"
               className="mt-4 flex items-center gap-1"
               disabled={followLoading}
             >
-              {user.follow_status.is_following ? (
+              {user.follow_status?.is_following ? (
                 <>
                   <UserCheck className="h-4 w-4" />
                   {followLoading ? 'Updating...' : 'Following'}
@@ -105,7 +107,27 @@ const Profile = () => {
       </div>
 
       <h2 className="text-xl font-bold mb-4">Posts</h2>
-      {posts.length > 0 ? (
+      
+      {!canViewPosts ? (
+        <div className="bg-white rounded-md shadow border p-8 text-center">
+          <div className="flex flex-col items-center gap-2">
+            <Lock className="h-10 w-10 text-gray-400" />
+            <h3 className="text-xl font-medium">This Account is Private</h3>
+            <p className="text-gray-600">
+              Follow this account to see their posts.
+            </p>
+            {currentUser && !isOwnProfile && (
+              <Button 
+                onClick={toggleFollowStatus}
+                className="mt-2"
+                disabled={followLoading}
+              >
+                {followLoading ? 'Processing...' : 'Follow'}
+              </Button>
+            )}
+          </div>
+        </div>
+      ) : posts.length > 0 ? (
         <>
           {posts.map((post, index) => {
             if (posts.length === index + 1) {

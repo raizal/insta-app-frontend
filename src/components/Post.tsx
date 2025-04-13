@@ -50,9 +50,11 @@ const Post = ({ post, onPostUpdated }: PostProps) => {
           {!post.user.profile_picture_url && <AvatarFallback>{post.user.name[0].toUpperCase()}</AvatarFallback>}
         </Avatar>
         <div className="ml-3 flex-1">
-          <Link to={`/profile/${post.user.username}`} className="font-medium">
-            @{post.user.username}
-          </Link>
+          <div className="flex flex-col">
+            <Link to={`/profile/${post.user.username}`} className="font-medium text-sm">
+              {post.user.username}
+            </Link>
+          </div>
         </div>
         <span className="text-xs text-gray-500">{formattedDate}</span>
       </div>

@@ -82,15 +82,17 @@ const PostCommentSection = ({
               {!comment.user.profile_picture_url && <AvatarFallback>{comment.user.name[0].toUpperCase()}</AvatarFallback>}
             </Avatar>
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <Link to={`/profile/${comment.user.username || comment.user.name}`} className="font-medium text-sm">
-                  {comment.user.username ? `@${comment.user.username}` : comment.user.name}
-                </Link>
-                <span className="text-xs text-gray-500">
+              <div className="flex flex-col">
+                <div className="flex flex-wrap items-center">
+                  <Link to={`/profile/${comment.user.username || comment.user.name}`} className="font-medium text-sm mr-1">
+                    {comment.user.username}
+                  </Link>
+                  <span className="text-sm">{comment.body}</span>
+                </div>
+                <span className="text-xs text-gray-500 mt-0.5">
                   {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                 </span>
               </div>
-              <p className="text-sm mt-1">{comment.body}</p>
             </div>
           </div>
         ))}
