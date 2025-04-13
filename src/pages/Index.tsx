@@ -6,9 +6,9 @@ import Feed from "./Feed";
 const Index = () => {
   // Add page title for Index/Home page
   useEffect(() => {
-    document.title = "Home | Insta-Echo";
+    document.title = "Home | Insta-App";
     return () => {
-      document.title = "Insta-Echo";
+      document.title = "Insta-App";
     };
   }, []);
   

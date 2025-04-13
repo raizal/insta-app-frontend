@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useLogin } from "@/hooks/useAuth";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { useCsrf } from "@/hooks/use-csrf";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,28 +14,35 @@ const Login = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  if (isAuthenticated) {
-    navigate("/");
-    return null;
-  }
+  const { getCsrfToken, isLoading: csrfLoading, error: csrfError, csrfToken } = useCsrf();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) return;
+  // useEffect(() => {
+  //   getCsrfToken();
+  // }, []);
 
-    const result = await login({ email, password });
-    
-    if (result.success) {
+  useEffect(() => {
+    if (isAuthenticated) {
       navigate("/");
     }
-  };
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Submitting");
+    if (!email || !password) return;
+    const result = await login({ email, password, _token: csrfToken });
+    console.log("Result: " + result);
+    if (result.success) {
+      // navigate("/");
+    }
+  }, [email, password, csrfToken, login]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-sevima-gray px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sevima-darkBlue via-sevima-blue to-sevima-lightBlue">
-            Insta-Echo
+            Insta-App
           </h1>
           <p className="mt-2 text-sevima-darkGray">
             Connect with friends and share your moments
@@ -46,15 +54,15 @@ const Login = () => {
             <CardTitle className="text-center text-sevima-blue">Login</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit}  className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
-                  Email
+                  Email or Username
                 </label>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="Email"
+                  type="text"
+                  placeholder="Email or Username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

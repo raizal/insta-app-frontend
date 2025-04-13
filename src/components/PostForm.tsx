@@ -1,23 +1,25 @@
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { createPost } from "@/services/postService";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
+import { useSubmitPost } from "@/hooks/useSubmitPost";
 
 const PostForm = () => {
   const [content, setContent] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const { isSubmitting, submitPostWithImage } = useSubmitPost();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setImageFile(file);
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Image must be less than 5MB");
@@ -34,31 +36,27 @@ const PostForm = () => {
 
   const removeImage = () => {
     setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !content.trim()) return;
 
-    setIsSubmitting(true);
-    try {
-      await createPost({
-        userId: user.id,
-        username: user.username,
-        userProfilePic: user.profilePicture,
-        content: content.trim(),
-        image: imagePreview,
-        likes: [],
-        comments: [],
-      });
-
-      toast.success("Post created successfully!");
+    // Submit the post using our hook
+    const response = await submitPostWithImage(content, imageFile);
+    
+    if (response) {
+      // Reset form state
+      setContent("");
+      setImagePreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      // Navigate to home page
       navigate("/");
-    } catch (error) {
-      console.error("Error creating post:", error);
-      toast.error("Failed to create post");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -107,6 +105,7 @@ const PostForm = () => {
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
+                  ref={fileInputRef}
                 />
               </label>
             </div>

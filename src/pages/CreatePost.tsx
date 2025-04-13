@@ -5,15 +5,14 @@ import PostForm from "@/components/PostForm";
 const CreatePost = () => {
   // Set page title when component mounts
   useEffect(() => {
-    document.title = "Create Post | Insta-Echo";
+    document.title = "Create Post | Insta-App";
     return () => {
-      document.title = "Insta-Echo";
+      document.title = "Insta-App";
     };
   }, []);
 
   return (
     <div className="max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-sevima-blue">Create Post</h1>
       <PostForm />
     </div>
   );

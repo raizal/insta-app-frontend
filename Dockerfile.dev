@@ -1,0 +1,26 @@
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm@9.0.1
+
+# Copy package.json and lockfile
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies
+RUN pnpm install
+
+# Copy source code
+COPY . .
+
+# Expose the dev server port (from vite.config.ts)
+EXPOSE 3000
+
+# Set environment variables
+ARG VITE_BASE_URL
+ENV VITE_BASE_URL=${VITE_BASE_URL}
+
+# Start development server
+CMD ["pnpm", "dev", "--host"] 

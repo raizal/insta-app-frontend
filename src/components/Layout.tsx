@@ -15,7 +15,12 @@ const Layout = () => {
   };
 
   const getInitials = (name: string) => {
-    return name.charAt(0).toUpperCase();
+    try {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    } catch (error) {
+      console.error("Error getting initials:", error);
+      return "U";
+    }
   };
 
   return (
@@ -23,7 +28,7 @@ const Layout = () => {
       {/* Mobile top navbar */}
       <header className="sticky top-0 z-50 flex items-center justify-between bg-white p-4 border-b md:hidden">
         <h1 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-sevima-darkBlue via-sevima-blue to-sevima-lightBlue">
-          Insta-Echo
+          Insta-App
         </h1>
         <div className="flex items-center space-x-2">
           <Button 
@@ -44,7 +49,7 @@ const Layout = () => {
           <div className="flex flex-col flex-1 overflow-y-auto pt-5 pb-4">
             <div className="px-4">
               <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sevima-darkBlue via-sevima-blue to-sevima-lightBlue">
-                Insta-Echo
+                Insta-App
               </h1>
             </div>
             <nav className="mt-8 flex flex-col flex-1 px-2 space-y-1">
@@ -53,21 +58,21 @@ const Layout = () => {
                 className="flex items-center px-4 py-3 text-sevima-black hover:bg-sevima-gray rounded-md"
               >
                 <Home className="h-5 w-5 mr-3 text-sevima-blue" />
-                <span>Home</span>
+                <span className="text-sevima-black text-md">Home</span>
               </Link>
               <Link
                 to="/create"
                 className="flex items-center px-4 py-3 text-sevima-black hover:bg-sevima-gray rounded-md"
               >
                 <PlusSquare className="h-5 w-5 mr-3 text-sevima-blue" />
-                <span>Create</span>
+                <span className="text-sevima-black text-md">Create</span>
               </Link>
               <Link
                 to={`/profile/${user?.username}`}
                 className="flex items-center px-4 py-3 text-sevima-black hover:bg-sevima-gray rounded-md"
               >
                 <User className="h-5 w-5 mr-3 text-sevima-blue" />
-                <span>Profile</span>
+                <span className="text-sevima-black text-md">Profile</span>
               </Link>
               <Button 
                 variant="ghost" 
@@ -75,17 +80,17 @@ const Layout = () => {
                 className="flex items-center justify-start px-4 py-3 text-sevima-black hover:bg-sevima-gray rounded-md"
               >
                 <LogOut className="h-5 w-5 mr-3 text-sevima-blue" />
-                <span>Logout</span>
+                <span className="text-sevima-black text-md">Logout</span>
               </Button>
             </nav>
             <div className="px-4 mt-auto pb-4">
               <div className="flex items-center">
                 <Avatar className="h-8 w-8 bg-sevima-blue text-white">
-                  <AvatarImage src={user?.profilePicture} alt={user?.username} />
-                  <AvatarFallback>{user ? getInitials(user.username) : "U"}</AvatarFallback>
+                  {user?.profile_picture_url && <AvatarImage src={user?.profile_picture_url} alt={user?.username} />}
+                  {!user?.profile_picture_url && <AvatarFallback>{user ? getInitials(user.name) : "U"}</AvatarFallback>}
                 </Avatar>
                 <div className="ml-3">
-                  <p className="text-sm font-medium">{user?.username}</p>
+                  <p className="text-sm font-medium">{user?.name}</p>
                 </div>
               </div>
             </div>
@@ -111,8 +116,8 @@ const Layout = () => {
           </Link>
           <Link to={`/profile/${user?.username}`} className="flex flex-col items-center text-sevima-darkGray">
             <Avatar className="h-6 w-6 bg-sevima-blue text-white">
-              <AvatarImage src={user?.profilePicture} alt={user?.username} />
-              <AvatarFallback>{user ? getInitials(user.username) : "U"}</AvatarFallback>
+              {user?.profile_picture_url && <AvatarImage src={user?.profile_picture_url} alt={user?.username} />}
+              {!user?.profile_picture_url && <AvatarFallback>{user ? getInitials(user.name) : "U"}</AvatarFallback>}
             </Avatar>
             <span className="text-xs mt-1">Profile</span>
           </Link>

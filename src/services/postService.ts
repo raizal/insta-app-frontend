@@ -1,234 +1,107 @@
-
 import { toast } from "sonner";
+import { AxiosResponse } from "axios";
+import axios from "@/lib/axios";
+import { ApiResponse, PaginatedResponse, Post, Comment, ProfileApiResponse } from "@/types/common";
 
-export interface Post {
-  id: string;
-  userId: string;
-  username: string;
-  userProfilePic: string;
-  content: string;
-  image: string | null;
-  likes: string[];
-  comments: Comment[];
-  createdAt: Date;
+interface LikePostResponse {
+  liked: boolean;
+  likeCount: number;
 }
 
-export interface Comment {
-  id: string;
-  userId: string;
-  username: string;
-  userProfilePic: string;
-  content: string;
-  createdAt: Date;
+export const getPosts = async (page: number = 1): Promise<PaginatedResponse<Post>> => {
+  const response = await axios.get<ApiResponse<PaginatedResponse<Post>>>('/web/posts', {
+    params: { page, per_page: 2 },
+    withCredentials: true,
+  });
+  return response.data.data;
+};
+
+export const likePost = async (postId: number): Promise<LikePostResponse> => {
+  const response = await axios.post<LikePostResponse>(`/web/posts/${postId}/like`, {}, {
+    withCredentials: true,
+  });
+  return response.data;
 }
 
-// Mock data for demonstration purposes
-const MOCK_POSTS: Post[] = [
-  {
-    id: "post1",
-    userId: "user1",
-    username: "johndoe",
-    userProfilePic: "https://source.unsplash.com/100x100/?portrait,man",
-    content: "Enjoying my vacation! 🌴",
-    image: "https://source.unsplash.com/800x600/?beach,vacation",
-    likes: ["user2", "user3"],
-    comments: [
-      {
-        id: "comment1",
-        userId: "user2",
-        username: "janedoe",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,woman",
-        content: "Looks amazing! Have a great time!",
-        createdAt: new Date(Date.now() - 3600000),
-      },
-      {
-        id: "comment2",
-        userId: "user3",
-        username: "sarahsmith",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,woman,2",
-        content: "Wow! The beach looks beautiful. Wish I was there!",
-        createdAt: new Date(Date.now() - 2800000),
-      },
-      {
-        id: "comment3",
-        userId: "user4",
-        username: "alexjones",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,man,2",
-        content: "Don't forget the sunscreen! 😎",
-        createdAt: new Date(Date.now() - 2500000),
-      },
-      {
-        id: "comment4",
-        userId: "user5",
-        username: "mikebrown",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,man,3",
-        content: "Which beach is this? I might plan a trip there too!",
-        createdAt: new Date(Date.now() - 2200000),
-      },
-    ],
-    createdAt: new Date(Date.now() - 86400000),
-  },
-  {
-    id: "post2",
-    userId: "user2",
-    username: "janedoe",
-    userProfilePic: "https://source.unsplash.com/100x100/?portrait,woman",
-    content: "Just finished this book. Highly recommend it!",
-    image: "https://source.unsplash.com/800x600/?book,reading",
-    likes: ["user1", "user4", "user5"],
-    comments: [
-      {
-        id: "comment5",
-        userId: "user1",
-        username: "johndoe",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,man",
-        content: "What's it about? I'm looking for a new read.",
-        createdAt: new Date(Date.now() - 1800000),
-      },
-      {
-        id: "comment6",
-        userId: "user4",
-        username: "alexjones",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,man,2",
-        content: "Added to my reading list! Thanks for sharing.",
-        createdAt: new Date(Date.now() - 1500000),
-      },
-    ],
-    createdAt: new Date(Date.now() - 172800000),
-  },
-  {
-    id: "post3",
-    userId: "user3",
-    username: "sarahsmith",
-    userProfilePic: "https://source.unsplash.com/100x100/?portrait,woman,2",
-    content: "My new home office setup is finally complete! 💻",
-    image: "https://source.unsplash.com/800x600/?desk,office",
-    likes: ["user1", "user2"],
-    comments: [],
-    createdAt: new Date(Date.now() - 259200000),
-  },
-  {
-    id: "post4",
-    userId: "user4",
-    username: "alexjones",
-    userProfilePic: "https://source.unsplash.com/100x100/?portrait,man,2",
-    content: "Hiked to the summit today. The view was worth every step!",
-    image: "https://source.unsplash.com/800x600/?mountain,hiking",
-    likes: ["user3", "user5"],
-    comments: [
-      {
-        id: "comment7",
-        userId: "user5",
-        username: "mikebrown",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,man,3",
-        content: "Which trail did you take? Looks breathtaking!",
-        createdAt: new Date(Date.now() - 1200000),
-      },
-    ],
-    createdAt: new Date(Date.now() - 345600000),
-  },
-  {
-    id: "post5",
-    userId: "user5",
-    username: "mikebrown",
-    userProfilePic: "https://source.unsplash.com/100x100/?portrait,man,3",
-    content: "Made this pasta from scratch. First attempt at homemade pasta!",
-    image: "https://source.unsplash.com/800x600/?pasta,food",
-    likes: ["user1", "user2", "user3", "user4"],
-    comments: [
-      {
-        id: "comment8",
-        userId: "user1",
-        username: "johndoe",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,man",
-        content: "Looks delicious! Would love the recipe.",
-        createdAt: new Date(Date.now() - 900000),
-      },
-      {
-        id: "comment9",
-        userId: "user2",
-        username: "janedoe",
-        userProfilePic: "https://source.unsplash.com/100x100/?portrait,woman",
-        content: "Great job for a first attempt! Mine never turns out this good.",
-        createdAt: new Date(Date.now() - 600000),
-      },
-    ],
-    createdAt: new Date(Date.now() - 432000000),
-  },
-];
+export const submitComment = async (postId: number, comment: string): Promise<ApiResponse<Comment>> => {
+  const response = await axios.post<ApiResponse<Comment>>(`/web/posts/${postId}/comment`, { body: comment }, {
+    withCredentials: true,
+  });
+  return response.data;
+}
 
-// In a real application, these functions would make API calls
-export const getPosts = async (): Promise<Post[]> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  
-  // Get posts from localStorage or use mock data
-  const storedPosts = localStorage.getItem("posts");
-  return storedPosts ? JSON.parse(storedPosts) : MOCK_POSTS;
+// export const addComment = async (postId: string, comment: Omit<Comment, "id" | "createdAt">): Promise<Comment> => {
+//   const posts = await getPosts();
+//   const postIndex = posts.findIndex((p) => p.id === postId);
+
+//   if (postIndex === -1) {
+//     throw new Error("Post not found");
+//   }
+
+//   const newComment: Comment = {
+//     ...comment,
+//     id: `comment${Date.now()}`,
+//     createdAt: new Date(),
+//   };
+
+//   posts[postIndex].comments.push(newComment);
+//   localStorage.setItem("posts", JSON.stringify(posts));
+
+//   return newComment;
+// };
+
+// export const getUserPosts = async (userId: string): Promise<Post[]> => {
+//   const posts = await getPosts();
+//   return posts.filter((post) => post.userId === userId);
+// };
+
+export const fetchPostComments = async (postId: string | number, page: number = 1): Promise<ApiResponse<PaginatedResponse<Comment>>> => {
+  try {
+    const response = await axios.get(`/web/posts/${postId}/comments`, {
+      params: { page },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching comments for post ${postId}:`, error);
+    throw error;
+  }
 };
 
-export const createPost = async (post: Omit<Post, "id" | "createdAt">): Promise<Post> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+export const submitPost = async (caption: string, imageFile?: File): Promise<ApiResponse<Post>> => {
+  try {
+    const formData = new FormData();
+    formData.append('caption', caption);
 
-  const newPost: Post = {
-    ...post,
-    id: `post${Date.now()}`,
-    createdAt: new Date(),
-  };
-
-  // Get existing posts
-  const posts = await getPosts();
-  const updatedPosts = [newPost, ...posts];
-  
-  // Save to localStorage
-  localStorage.setItem("posts", JSON.stringify(updatedPosts));
-  
-  return newPost;
-};
-
-export const likePost = async (postId: string, userId: string): Promise<void> => {
-  const posts = await getPosts();
-  const postIndex = posts.findIndex((p) => p.id === postId);
-  
-  if (postIndex !== -1) {
-    const post = posts[postIndex];
-    const hasLiked = post.likes.includes(userId);
-    
-    if (hasLiked) {
-      post.likes = post.likes.filter((id) => id !== userId);
-      toast.success("Like removed");
-    } else {
-      post.likes.push(userId);
-      toast.success("Post liked");
+    if (imageFile) {
+      formData.append('image', imageFile);
     }
+
+    const response = await axios.post<ApiResponse<Post>>('/web/posts', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting post:", error);
+    throw error;
+  }
+};
+
+export const getUserPosts = async (username: string, page: number = 1, perPage: number = 6): Promise<ProfileApiResponse> => {
+  try {
+    const response = await axios.get<ProfileApiResponse>(`/web/users/${username}/posts`, {
+      params: { page, per_page: perPage },
+      withCredentials: true,
+    });
     
-    posts[postIndex] = post;
-    localStorage.setItem("posts", JSON.stringify(posts));
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching posts for user ${username}:`, error);
+    throw error;
   }
-};
-
-export const addComment = async (postId: string, comment: Omit<Comment, "id" | "createdAt">): Promise<Comment> => {
-  const posts = await getPosts();
-  const postIndex = posts.findIndex((p) => p.id === postId);
-  
-  if (postIndex === -1) {
-    throw new Error("Post not found");
-  }
-  
-  const newComment: Comment = {
-    ...comment,
-    id: `comment${Date.now()}`,
-    createdAt: new Date(),
-  };
-  
-  posts[postIndex].comments.push(newComment);
-  localStorage.setItem("posts", JSON.stringify(posts));
-  
-  return newComment;
-};
-
-export const getUserPosts = async (userId: string): Promise<Post[]> => {
-  const posts = await getPosts();
-  return posts.filter((post) => post.userId === userId);
 };
