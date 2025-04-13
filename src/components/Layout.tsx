@@ -85,7 +85,7 @@ const Layout = () => {
             </nav>
             <div className="px-4 mt-auto pb-4">
               <div className="flex items-center">
-                <Avatar className="h-8 w-8 bg-sevima-blue text-white">
+                <Avatar className="h-8 w-8">
                   {user?.profile_picture_url && <AvatarImage src={user?.profile_picture_url} alt={user?.username} />}
                   {!user?.profile_picture_url && <AvatarFallback>{user ? getInitials(user.name) : "U"}</AvatarFallback>}
                 </Avatar>

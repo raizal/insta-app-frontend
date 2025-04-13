@@ -114,8 +114,8 @@ const PostForm = () => {
         <CardFooter>
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange hover:opacity-90"
-            disabled={!content.trim() || isSubmitting}
+            className="w-full bg-gradient-to-r from-sevima-darkBlue via-sevima-blue to-sevima-lightBlue hover:opacity-90"
+            disabled={!(content.trim() && imageFile) || isSubmitting}
           >
             {isSubmitting ? "Posting..." : "Post"}
           </Button>
