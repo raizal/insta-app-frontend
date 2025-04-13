@@ -1,11 +1,13 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Post from "@/components/Post";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserCheck, Lock } from "lucide-react";
+import { UserPlus, UserCheck, Lock, Camera } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { updateProfilePicture } from "@/services/userService";
+import { toast } from "sonner";
 
 const Profile = () => {
   const { username = "" } = useParams<{ username: string }>();
@@ -20,6 +22,8 @@ const Profile = () => {
     followLoading,
     toggleFollowStatus
   } = useUserProfile(username);
+  const [uploadingPicture, setUploadingPicture] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isOwnProfile = currentUser?.username === username;
   const isFollowing = user?.follow_status?.is_following || false;
@@ -33,6 +37,36 @@ const Profile = () => {
       navigate(`/profile/${currentUser.username}`);
     }
   }, [username, currentUser, navigate]);
+
+  const handleProfilePictureClick = () => {
+    if (isOwnProfile && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPicture(true);
+    try {
+      const response = await updateProfilePicture(file);
+      if (response.success) {
+        toast.success("Profile picture updated successfully");
+        refreshProfile();
+      } else {
+        toast.error("Failed to update profile picture");
+      }
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      toast.error("Failed to update profile picture");
+    } finally {
+      setUploadingPicture(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
 
   // Infinite scroll setup
   const observer = useRef<IntersectionObserver | null>(null);
@@ -59,23 +93,44 @@ const Profile = () => {
     <div className="max-w-lg mx-auto pb-20">
       <div className="bg-white rounded-md shadow border mb-6">
         <div className="p-6 flex flex-col items-center">
-          <Avatar className="h-24 w-24">
-            {user?.profile_picture_url && <AvatarImage src={user.profile_picture_url} alt={user.username} />}
-            {!user?.profile_picture_url && <AvatarFallback className="text-2xl">{username?.[0].toUpperCase()}</AvatarFallback>}
-          </Avatar>
+          <div className="relative">
+            <Avatar 
+              className="h-24 w-24" 
+              onClick={handleProfilePictureClick}
+              style={{ cursor: isOwnProfile ? 'pointer' : 'default' }}
+            >
+              {user?.profile_picture_url && <AvatarImage src={user.profile_picture_url} alt={user.username} />}
+              {!user?.profile_picture_url && <AvatarFallback className="text-2xl">{username?.[0].toUpperCase()}</AvatarFallback>}
+            </Avatar>
+            {isOwnProfile && (
+              <div className="absolute bottom-0 right-0 p-1 bg-sevima-blue rounded-full text-white">
+                <Camera className="h-4 w-4" />
+              </div>
+            )}
+            {isOwnProfile && (
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept="image/*" 
+                onChange={handleFileChange}
+                className="hidden" 
+                disabled={uploadingPicture}
+              />
+            )}
+          </div>
           <h1 className="text-2xl font-bold mt-4">{user?.name || username}</h1>
           <p className="text-gray-600">@{user?.username || username}</p>
           
           <div className="flex space-x-4 mt-4">
-            <div className="text-center">
+            <div className="text-center w-20">
               <span className="font-bold">{user?.posts_count || 0}</span>
               <p className="text-sm text-gray-500">Posts</p>
             </div>
-            <div className="text-center">
+            <div className="text-center w-20">
               <span className="font-bold">{user?.followers_count || 0}</span>
               <p className="text-sm text-gray-500">Followers</p>
             </div>
-            <div className="text-center">
+            <div className="text-center w-20">
               <span className="font-bold">{user?.following_count || 0}</span>
               <p className="text-sm text-gray-500">Following</p>
             </div>
